@@ -6,14 +6,18 @@
 
 ## Build and Test
 
-After ANY Go code change, run both, verbatim (same checks as `.github/workflows/ci.yml`):
+After ANY Go code change, run the same checks CI does (`.github/workflows/ci.yml`):
 
 ```sh
+go mod tidy && git diff --exit-code -- go.mod go.sum
+go build ./...
 go test -race ./...
 golangci-lint run --timeout=5m --allow-parallel-runners --max-same-issues 0 --max-issues-per-linter 0 ./...
 ```
 
 Use `./...` exactly as written — don't let it get mangled into a path fragment (e.g. `go test -race mojotx.`).
+
+CI also runs `go vet ./...` as its own step, but that's redundant to run locally — `golangci-lint` already runs the `govet` linter (plus staticcheck and many others), so a clean `golangci-lint` run implies `go vet` is clean too.
 
 ## Conventions
 
