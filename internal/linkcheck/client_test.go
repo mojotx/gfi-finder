@@ -106,3 +106,55 @@ func TestClient_HasLinkedPR_error(t *testing.T) {
 	_, err := client.HasLinkedPR("cli", "cli", 42)
 	require.Error(t, err)
 }
+
+func TestClient_HasLinkedPR_paginatesUntilLinkFound(t *testing.T) {
+	firstPage := `{"data":{"repository":{"issue":{"timelineItems":{
+		"pageInfo":{"hasNextPage":true,"endCursor":"cursor1"},
+		"nodes":[{"__typename":"CrossReferencedEvent","source":{"__typename":"Issue"}}]
+	}}}}}`
+	secondPage := `{"data":{"repository":{"issue":{"timelineItems":{
+		"pageInfo":{"hasNextPage":false,"endCursor":""},
+		"nodes":[{"__typename":"ConnectedEvent","subject":{"__typename":"PullRequest"}}]
+	}}}}}`
+
+	var requests int
+	rt := roundTripFunc(func(req *http.Request) (*http.Response, error) {
+		requests++
+		if requests == 1 {
+			return jsonResponse(firstPage), nil
+		}
+		return jsonResponse(secondPage), nil
+	})
+
+	client := NewClient(newTestGraphQLClient(t, rt))
+	linked, err := client.HasLinkedPR("cli", "cli", 42)
+	require.NoError(t, err)
+	assert.True(t, linked)
+	assert.Equal(t, 2, requests, "expected a second page fetch to find the link")
+}
+
+func TestClient_HasLinkedPR_paginatesWithNoLinkFound(t *testing.T) {
+	firstPage := `{"data":{"repository":{"issue":{"timelineItems":{
+		"pageInfo":{"hasNextPage":true,"endCursor":"cursor1"},
+		"nodes":[{"__typename":"CrossReferencedEvent","source":{"__typename":"Issue"}}]
+	}}}}}`
+	secondPage := `{"data":{"repository":{"issue":{"timelineItems":{
+		"pageInfo":{"hasNextPage":false,"endCursor":""},
+		"nodes":[]
+	}}}}}`
+
+	var requests int
+	rt := roundTripFunc(func(req *http.Request) (*http.Response, error) {
+		requests++
+		if requests == 1 {
+			return jsonResponse(firstPage), nil
+		}
+		return jsonResponse(secondPage), nil
+	})
+
+	client := NewClient(newTestGraphQLClient(t, rt))
+	linked, err := client.HasLinkedPR("cli", "cli", 42)
+	require.NoError(t, err)
+	assert.False(t, linked)
+	assert.Equal(t, 2, requests)
+}

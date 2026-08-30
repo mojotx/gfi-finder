@@ -49,7 +49,11 @@ type timelineResponse struct {
 	Repository struct {
 		Issue struct {
 			TimelineItems struct {
-				Nodes []timelineNode `json:"nodes"`
+				Nodes    []timelineNode `json:"nodes"`
+				PageInfo struct {
+					HasNextPage bool   `json:"hasNextPage"`
+					EndCursor   string `json:"endCursor"`
+				} `json:"pageInfo"`
 			} `json:"timelineItems"`
 		} `json:"issue"`
 	} `json:"repository"`
@@ -71,18 +75,31 @@ func hasLinkedPR(nodes []timelineNode) bool {
 }
 
 // HasLinkedPR reports whether the issue numbered number in owner/repo has
-// ever been cross-referenced or connected to a pull request.
+// ever been cross-referenced or connected to a pull request. It pages
+// through the full timeline, since a busy issue can have more cross-
+// reference events than fit in a single GraphQL page.
 func (c *Client) HasLinkedPR(owner, repo string, number int) (bool, error) {
-	vars := map[string]interface{}{
-		"owner":  owner,
-		"repo":   repo,
-		"number": number,
-	}
+	var after *string
+	for {
+		vars := map[string]interface{}{
+			"owner":  owner,
+			"repo":   repo,
+			"number": number,
+			"after":  after,
+		}
 
-	var resp timelineResponse
-	if err := c.doer.Do(timelineQuery, vars, &resp); err != nil {
-		return false, fmt.Errorf("check linked pull requests for issue #%d: %w", number, err)
-	}
+		var resp timelineResponse
+		if err := c.doer.Do(timelineQuery, vars, &resp); err != nil {
+			return false, fmt.Errorf("check linked pull requests for issue #%d: %w", number, err)
+		}
 
-	return hasLinkedPR(resp.Repository.Issue.TimelineItems.Nodes), nil
+		items := resp.Repository.Issue.TimelineItems
+		if hasLinkedPR(items.Nodes) {
+			return true, nil
+		}
+		if !items.PageInfo.HasNextPage {
+			return false, nil
+		}
+		after = &items.PageInfo.EndCursor
+	}
 }
