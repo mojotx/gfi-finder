@@ -27,7 +27,7 @@ using a closing keyword like `Fixes #N` or `Closes #N`, open or closed).
 Combined with `no:assignee` and a comma-separated `label:"A","B"` list
 (which GitHub OR's together), the whole search collapses into **one query**:
 
-```
+```text
 repo:OWNER/REPO is:issue is:open no:assignee -linked:pr label:"help wanted","good first issue"
 ```
 
