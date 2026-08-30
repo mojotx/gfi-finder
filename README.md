@@ -1,4 +1,6 @@
-# gfi-finder
+# gfi-finder -- Find Good First Issues on GitHub
+
+![gfi-finder mascot](assets/gfi-gopher-200.png)
 
 [![CI](https://github.com/mojotx/gfi-finder/actions/workflows/ci.yml/badge.svg)](https://github.com/mojotx/gfi-finder/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/mojotx/gfi-finder/actions/workflows/codeql.yml/badge.svg)](https://github.com/mojotx/gfi-finder/actions/workflows/codeql.yml)
@@ -52,23 +54,29 @@ can reference an issue in its description or a commit message without
 "closing" it, and the Search API's `-linked:pr` qualifier has no visibility
 into that. Strict mode trades speed for a more complete picture.
 
+## Installation
+
+```sh
+go install github.com/mojotx/gfi-finder@latest
+```
+
 ## Usage
 
 ```sh
 # Fast mode: candidates with a "good first issue" or "help wanted" label
-gfi-finder --repo cli/cli --label "good first issue" --label "help wanted"
+gfi-finder --repo kubernetes/kubernetes --label "good first issue" --label "help wanted"
 
 # Comma-separated labels work too (OR'd, same as repeating --label)
-gfi-finder --repo cli/cli --label "good first issue,help wanted"
+gfi-finder --repo kubernetes/kubernetes --label "good first issue,help wanted"
 
 # Strict mode: also filter out issues merely mentioned by a PR
-gfi-finder --repo cli/cli --label "good first issue" --strict-link-check
+gfi-finder --repo kubernetes/kubernetes --label "good first issue" --strict-link-check
 
 # Include issues that already have an assignee
-gfi-finder --repo cli/cli --label "good first issue" --allow-assigned
+gfi-finder --repo kubernetes/kubernetes --label "good first issue" --allow-assigned
 
 # Machine-readable output for scripting
-gfi-finder --repo cli/cli --label "good first issue" --json --limit 50
+gfi-finder --repo kubernetes/kubernetes --label "good first issue" --json --limit 50
 ```
 
 ### Flags
