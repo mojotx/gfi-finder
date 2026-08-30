@@ -14,7 +14,10 @@ your project uses to flag actionable issues.
 
 It uses [`github.com/cli/go-gh`](https://github.com/cli/go-gh) — the same
 library the `gh` CLI itself uses — so it picks up your existing
-`gh auth login` session for free. No separate token setup required.
+`gh auth login` session for free. No separate token setup required, as
+long as the [`gh` CLI](https://cli.github.com/) is installed and
+authenticated (or a `GH_TOKEN`/`GITHUB_TOKEN` environment variable is set,
+which go-gh also honors without requiring `gh` itself to be installed).
 
 ## How it works
 
@@ -61,6 +64,21 @@ into that. Strict mode trades speed for a more complete picture.
 ```sh
 go install github.com/mojotx/gfi-finder@latest
 ```
+
+### Authentication
+
+`gfi-finder` needs a GitHub token to make API requests. The easiest way is
+to install the [`gh` CLI](https://cli.github.com/) and run
+`gh auth login` once; `gfi-finder` will pick up that session automatically.
+Without it, you'll see:
+
+```text
+Error: authentication token not found for host github.com
+```
+
+If you'd rather not install `gh`, set a `GH_TOKEN` or `GITHUB_TOKEN`
+environment variable to a [personal access
+token](https://github.com/settings/tokens) instead.
 
 ## Usage
 
