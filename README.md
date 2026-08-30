@@ -103,7 +103,7 @@ gfi-finder --repo kubernetes/kubernetes --label "good first issue" --json --limi
 
 | Flag                  | Default | Description                                                          |
 | --------------------- | ------- | -------------------------------------------------------------------- |
-| `--help`, `-h`        | —       | Help                                                                 |
+| `--help`, `-h`        | `false` | Show help and exit                                                   |
 | `--repo`              | —       | `OWNER/REPO` to search (required)                                    |
 | `--label`, `-l`       | —       | Label to match; repeatable or comma-separated (OR'd)                 |
 | `--allow-assigned`    | `false` | Include issues that already have an assignee                         |
