@@ -1,2 +1,3 @@
 /gfi-finder
 *.test
+coverage.out
