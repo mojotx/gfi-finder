@@ -8,7 +8,9 @@
 
 `gfi-finder` finds "good first issue" candidates in a GitHub repository:
 open issues matching your labels that are **unassigned** and have **no
-linked pull request**.
+linked pull request**. The name comes from its original use case, but any
+label(s) work — `help wanted`, `bug`, `documentation`, or anything else
+your project uses to flag actionable issues.
 
 It uses [`github.com/cli/go-gh`](https://github.com/cli/go-gh) — the same
 library the `gh` CLI itself uses — so it picks up your existing
