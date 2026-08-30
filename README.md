@@ -1,5 +1,9 @@
 # gfi-finder
 
+[![CI](https://github.com/mojotx/gfi-finder/actions/workflows/ci.yml/badge.svg)](https://github.com/mojotx/gfi-finder/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/mojotx/gfi-finder/actions/workflows/codeql.yml/badge.svg)](https://github.com/mojotx/gfi-finder/actions/workflows/codeql.yml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/mojotx/gfi-finder.svg)](https://pkg.go.dev/github.com/mojotx/gfi-finder)
+
 `gfi-finder` finds "good first issue" candidates in a GitHub repository:
 open issues matching your labels that are **unassigned** and have **no
 linked pull request**.
@@ -70,7 +74,7 @@ gfi-finder --repo cli/cli --label "good first issue" --json --limit 50
 ### Flags
 
 | Flag                  | Default | Description                                                          |
-|-----------------------|---------|------------------------------------------------------------------------|
+| --------------------- | ------- | -------------------------------------------------------------------- |
 | `--repo`              | —       | `OWNER/REPO` to search (required)                                    |
 | `--label`, `-l`       | —       | Label to match; repeatable or comma-separated (OR'd)                 |
 | `--allow-assigned`    | `false` | Include issues that already have an assignee                         |
