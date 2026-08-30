@@ -15,13 +15,11 @@ import (
 // RenderTable writes issues to w as a simple aligned table.
 func RenderTable(w io.Writer, issues []search.Issue) error {
 	tw := tabwriter.NewWriter(w, 0, 2, 2, ' ', 0)
-	if _, err := fmt.Fprintln(tw, "NUMBER\tTITLE\tURL\tLABELS"); err != nil {
-		return err
-	}
+	// tabwriter buffers writes and only touches w on Flush, so Write itself
+	// never errors; the error path is checked there instead.
+	_, _ = fmt.Fprintln(tw, "NUMBER\tTITLE\tURL\tLABELS")
 	for _, iss := range issues {
-		if _, err := fmt.Fprintf(tw, "#%d\t%s\t%s\t%s\n", iss.Number, iss.Title, iss.URL, strings.Join(iss.Labels, ", ")); err != nil {
-			return err
-		}
+		_, _ = fmt.Fprintf(tw, "#%d\t%s\t%s\t%s\n", iss.Number, iss.Title, iss.URL, strings.Join(iss.Labels, ", "))
 	}
 	return tw.Flush()
 }

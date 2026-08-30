@@ -11,6 +11,45 @@ import (
 	"github.com/mojotx/gfi-finder/internal/search"
 )
 
+func TestNewRootCmd_flagDefaults(t *testing.T) {
+	cmd := NewRootCmd()
+
+	flag := cmd.Flags().Lookup("repo")
+	require.NotNil(t, flag)
+	assert.Empty(t, flag.DefValue)
+
+	allowAssigned, err := cmd.Flags().GetBool("allow-assigned")
+	require.NoError(t, err)
+	assert.False(t, allowAssigned)
+
+	strict, err := cmd.Flags().GetBool("strict-link-check")
+	require.NoError(t, err)
+	assert.False(t, strict)
+
+	jsonOut, err := cmd.Flags().GetBool("json")
+	require.NoError(t, err)
+	assert.False(t, jsonOut)
+
+	limit, err := cmd.Flags().GetInt("limit")
+	require.NoError(t, err)
+	assert.Equal(t, search.DefaultLimit, limit)
+
+	labels, err := cmd.Flags().GetStringSlice("label")
+	require.NoError(t, err)
+	assert.Empty(t, labels)
+}
+
+func TestNewRootCmd_requiresRepo(t *testing.T) {
+	cmd := NewRootCmd()
+	cmd.SetArgs([]string{})
+	cmd.SetOut(&bytes.Buffer{})
+	cmd.SetErr(&bytes.Buffer{})
+
+	err := cmd.Execute()
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "repo")
+}
+
 type fakeSearcher struct {
 	issues []search.Issue
 	err    error

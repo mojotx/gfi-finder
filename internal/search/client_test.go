@@ -90,6 +90,45 @@ func TestClient_SearchIssues_respectsLimit(t *testing.T) {
 	assert.Len(t, issues, 3)
 }
 
+func TestClient_SearchIssues_nonPositiveLimitUsesDefault(t *testing.T) {
+	tests := []struct {
+		name  string
+		limit int
+	}{
+		{name: "zero", limit: 0},
+		{name: "negative", limit: -5},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rt := roundTripFunc(func(req *http.Request) (*http.Response, error) {
+				return jsonResponse(makeSearchResponse(perPage, 1)), nil
+			})
+
+			client := NewClient(newTestRESTClient(t, rt))
+			issues, err := client.SearchIssues("repo:cli/cli is:issue", tt.limit)
+			require.NoError(t, err)
+
+			assert.Len(t, issues, DefaultLimit)
+		})
+	}
+}
+
+func TestClient_SearchIssues_capsAtMaxPages(t *testing.T) {
+	var requests int
+	rt := roundTripFunc(func(req *http.Request) (*http.Response, error) {
+		requests++
+		return jsonResponse(makeSearchResponse(perPage, 1)), nil
+	})
+
+	client := NewClient(newTestRESTClient(t, rt))
+	issues, err := client.SearchIssues("repo:cli/cli is:issue", 10000)
+	require.NoError(t, err)
+
+	assert.Equal(t, maxPages, requests, "expected pagination to stop at GitHub's 1000-result cap")
+	assert.Len(t, issues, maxPages*perPage)
+}
+
 func TestClient_SearchIssues_httpError(t *testing.T) {
 	rt := roundTripFunc(func(req *http.Request) (*http.Response, error) {
 		return &http.Response{

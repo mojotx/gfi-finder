@@ -3,6 +3,7 @@ package output
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,6 +11,13 @@ import (
 
 	"github.com/mojotx/gfi-finder/internal/search"
 )
+
+// erroringWriter fails every Write, to exercise the tabwriter Flush error path.
+type erroringWriter struct{}
+
+func (erroringWriter) Write([]byte) (int, error) {
+	return 0, errors.New("write failed")
+}
 
 func TestRenderTable(t *testing.T) {
 	var buf bytes.Buffer
@@ -31,6 +39,11 @@ func TestRenderTable_empty(t *testing.T) {
 	err := RenderTable(&buf, nil)
 	require.NoError(t, err)
 	assert.Contains(t, buf.String(), "NUMBER")
+}
+
+func TestRenderTable_writeError(t *testing.T) {
+	err := RenderTable(erroringWriter{}, []search.Issue{{Number: 1, Title: "Fix bug"}})
+	require.Error(t, err)
 }
 
 func TestRenderJSON(t *testing.T) {
