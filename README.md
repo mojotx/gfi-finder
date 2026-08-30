@@ -1,6 +1,6 @@
 # gfi-finder -- Find Good First Issues on GitHub
 
-![gfi-finder mascot](assets/gfi-gopher-200.png)
+![gfi-finder mascot](assets/gfi-gopher.png)
 
 [![CI](https://github.com/mojotx/gfi-finder/actions/workflows/ci.yml/badge.svg)](https://github.com/mojotx/gfi-finder/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/mojotx/gfi-finder/actions/workflows/codeql.yml/badge.svg)](https://github.com/mojotx/gfi-finder/actions/workflows/codeql.yml)
